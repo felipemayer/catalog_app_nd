@@ -1,0 +1,17 @@
+{% extends "layout.html" %} {% block title %}Index{% endblock %} {% block head %} {{ super() }} {% endblock %}{%block navbar%}{{
+super() }}{%endblock%}{% block content %}
+<div id="new-category" class="main form">
+    <div>
+        <h2>Create Category</h2>
+        <form action="#" method="POST">
+            <p>Title</p>
+            <input type="text" placeholder="Title">
+            <br>
+            <div id="buttons">
+                <input type="submit" class="btn btn-confirm" value="Save">
+                <a href="#">Cancelar</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

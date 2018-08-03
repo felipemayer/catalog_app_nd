@@ -1,0 +1,16 @@
+{% extends "layout.html" %} {% block title %}Index{% endblock %} {% block head %} {{ super() }} {% endblock %}{%block navbar%}{{
+super() }}{%endblock%}{% block content %}
+<div id="item-detail" class="main">
+    <div>
+        <h2>Título da Categoria</h2>
+        <p>Lorem ipsum dolor sit amet consectetur, adipisicing elit. Recusandae itaque sint, expedita similique voluptatem mollitia
+            rem laborum quae obcaecati? Assumenda laudantium soluta officiis non illum iusto, aliquam impedit accusantium
+            nam!
+        </p>
+    </div>
+    <div id="buttons-detail">
+        <a href="#" class="btn btn-confirm">Edit</a>
+        <a href="#" class="btn btn-danger">Delete</a>
+    </div>
+</div>
+{% endblock %}

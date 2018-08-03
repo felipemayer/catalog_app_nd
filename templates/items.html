@@ -1,0 +1,49 @@
+{% extends "layout.html" %} {% block title %}Index{% endblock %} {% block head %} {{ super() }} {% endblock %}{%block navbar%}{{
+super() }}{%endblock%}{% block content %}
+<aside id="side">
+    <div>
+        <h3>Categories</h3>
+        <ul>
+            <li>
+                <a href="#" class="list">Futebol</a>
+            </li>
+            <li>
+                <a href="#" class="list">Futebol</a>
+            </li>
+            <li>
+                <a href="#" class="list">Futebol</a>
+            </li>
+            <li>
+                <a href="#" class="list">Futebol</a>
+            </li>
+        </ul>
+    </div>
+    <a href="" class="btn btn-primary">Add Category</a>
+</aside>
+<div id="line"></div>
+<article id="article" class="main">
+    <div>
+        <h2>Category Name (13 items)</h2>
+        <ul>
+            <li>
+                <a href="#" class="list">Futebol
+                    <span>(Categoria)</a>
+            </li>
+            <li>
+                <a href="#" class="list">Futebol
+                    <span>(Categoria)</a>
+            </li>
+            <li>
+                <a href="#" class="list">Futebol
+                    <span>(Categoria)</a>
+            </li>
+            <li>
+                <a href="#" class="list">Futebol
+                    <span>(Categoria)</a>
+            </li>
+        </ul>
+    </div>
+    <a href="" class="btn btn-primary">Add New Item</a>
+</article>
+
+{% endblock %}
