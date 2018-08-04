@@ -6,7 +6,13 @@ super() }}{%endblock%}{% block content %}
         <ul>
             {% for c in categories %}
             <li>
-                <a href="{{url_for('showCatalogItems', categoryTitle = c.title, categoryId = c.id)}}" class="list">{{c.title}}</a>
+                <a href="{{url_for('showCatalogItems', categoryTitle = c.title, categoryId = c.id)}}" class="list-item">{{c.title}}</a>
+                <a href="{{url_for('editCategory', categoryId = c.id)}}" class="icon">
+                    <img src="{{url_for('static', filename='edit.png')}}" alt="">
+                </a>
+                <a href="{{url_for('deleteCategory', categoryId = c.id)}}" class="icon">
+                    <img src="{{url_for('static', filename='delete.png')}}" alt="">
+                </a>
             </li>
             {% endfor %}
         </ul>

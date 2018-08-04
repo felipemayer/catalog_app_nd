@@ -43,13 +43,7 @@ def newItem():
         return render_template('new_item.html', categories=categories)
 
 
-@app.route("/catalog/<int:catalogItemId>/<int:itemId>")
-def showItem(catalogItemId, itemId):
-    item = session.query(Item).filter_by(id=itemId).one()
-    return render_template('item_detail.html', item=item)
-
-
-@app.route("/catalog/<int:itemId>/edit", methods=['GET', 'POST'])
+@app.route("/catalog/item/<int:itemId>/edit", methods=['GET', 'POST'])
 def editItem(itemId):
     item = session.query(Item).filter_by(id=itemId).one()
     categories = session.query(Category).all()
@@ -66,6 +60,12 @@ def editItem(itemId):
         return render_template('edit_item.html', item=item, categories=categories)
 
 
+@app.route("/catalog/<int:catalogItemId>/<int:itemId>")
+def showItem(catalogItemId, itemId):
+    item = session.query(Item).filter_by(id=itemId).one()
+    return render_template('item_detail.html', item=item)
+
+
 @app.route("/catalog/category/new", methods=['GET', 'POST'])
 def newCategory():
     if request.method == 'POST':
@@ -75,6 +75,18 @@ def newCategory():
         return redirect(url_for('showHome'))
     else:
         return render_template('new_category.html')
+
+
+@app.route("/catalog/category/<int:categoryId>/edit", methods=['GET', 'POST'])
+def editCategory(categoryId):
+    category = session.query(Category).filter_by(id=categoryId).one()
+    if request.method == 'POST':
+        category.title = request.form['title']
+        session.add(category)
+        session.commit()
+        return redirect(url_for('showHome'))
+    else:
+        return render_template('edit_category.html', category=category)
 
 
 @app.route("/catalog/item/<int:itemId>/delete", methods=['GET', 'POST'])
