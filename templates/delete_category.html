@@ -1,0 +1,16 @@
+{% extends "layout.html" %} {% block title %}Index{% endblock %} {% block head %} {{ super() }} {% endblock %}{%block navbar%}{{
+super() }}{%endblock%}{% block content %}
+<div id="delete-item" class="main form">
+    <div>
+        <h2>Delete Category - {{category.title}}</h2>
+        <form action="{{url_for('deleteCategory', categoryId = category.id)}}" method="POST">
+            <p>Are you sure tou want to delete? </p>
+            <br>
+            <div id="buttons">
+                <input type="submit" class="btn btn-danger" value="Delete">
+                <a href="{{url_for('showHome')}}">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

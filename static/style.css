@@ -67,7 +67,6 @@ textarea {
 /* navbar */
 #navbar {
   padding: 20px 10%;
-  color: #ffffff;
   background-color: #24088a;
   display: flex;
   height: 10vh;
@@ -77,6 +76,11 @@ textarea {
 
 #navbar h1 {
   font-size: 1.8em;
+}
+
+#navbar a {
+  text-decoration: none;
+  color: #ffffff;
 }
 
 /* containers */
@@ -109,10 +113,10 @@ textarea {
 
 /* HOME - side */
 #side {
-  flex-grow: 1;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
+  width: 200px;
 }
 
 #side h3 {
@@ -130,7 +134,7 @@ textarea {
 
 /* HOME - article */
 #article {
-  flex-grow: 9;
+  flex-grow: 1;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -141,9 +145,9 @@ textarea {
   font-size: 14px;
 }
 
-#article .btn-primary {
-  width: 200px;
-  align-self: flex-end;
+#delete-category {
+  text-decoration: none;
+  margin-left: 10px;
 }
 
 /* item-detail */
@@ -153,7 +157,22 @@ textarea {
   justify-content: space-between;
 }
 
-/* admin-item */
+#item-detail .btn-primary {
+  width: 200px;
+  align-self: flex-end;
+}
+
+#item-detail #buttons {
+  width: 200px;
+  align-self: flex-end;
+}
+
+#delete-item {
+  text-decoration: none;
+  margin-left: 10px;
+}
+
+/* detail */
 /* new-category */
 .form h4 {
   font-size: 14px;

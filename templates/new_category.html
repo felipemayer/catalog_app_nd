@@ -3,13 +3,13 @@ super() }}{%endblock%}{% block content %}
 <div id="new-category" class="main form">
     <div>
         <h2>Create Category</h2>
-        <form action="#" method="POST">
+        <form action="{{ url_for('newCategory')}}" method="POST">
             <p>Title</p>
-            <input type="text" placeholder="Title">
+            <input type="text" placeholder="Title" name="title">
             <br>
             <div id="buttons">
                 <input type="submit" class="btn btn-confirm" value="Save">
-                <a href="#">Cancelar</a>
+                <a href="{{url_for('showHome')}}">Cancel</a>
             </div>
         </form>
     </div>

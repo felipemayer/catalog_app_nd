@@ -1,0 +1,26 @@
+{% extends "layout.html" %} {% block title %}Index{% endblock %} {% block head %} {{ super() }} {% endblock %}{%block navbar%}{{
+super() }}{%endblock%}{% block content %}
+<div class="main form" id="admin-item">
+    <div>
+        <h2>Create New Item</h2>
+        <form action="{{ url_for('newItem')}}" method="POST">
+            <h4>Title</h4>
+            <input name="title" type="text" placeholder="Title">
+            <h4>Description</h4>
+            <textarea name="description" rows="10"></textarea>
+            <h4>Category</h4>
+            <select name="category">
+                {% for c in categories %}
+                <option value="{{c.title}}">{{c.title}}</option>
+                {% endfor %}
+            </select>
+            <br>
+            <div id="buttons">
+                <input type="submit" class="btn btn-confirm" value="Save">
+                <a href="{{url_for('showHome')}}">Cancel</a>
+
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

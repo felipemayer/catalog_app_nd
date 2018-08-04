@@ -4,46 +4,32 @@ super() }}{%endblock%}{% block content %}
     <div>
         <h3>Categories</h3>
         <ul>
+            {% for c in categories %}
             <li>
-                <a href="#" class="list">Futebol</a>
+                <a href="{{url_for('showCatalogItems', categoryTitle = c.title, categoryId = c.id)}}" class="list">{{c.title}}</a>
             </li>
-            <li>
-                <a href="#" class="list">Futebol</a>
-            </li>
-            <li>
-                <a href="#" class="list">Futebol</a>
-            </li>
-            <li>
-                <a href="#" class="list">Futebol</a>
-            </li>
+            {% endfor %}
         </ul>
     </div>
-    <a href="" class="btn btn-primary">Add Category</a>
+    <a href="{{url_for('newCategory')}}" class="btn btn-primary">Add Category</a>
 </aside>
 <div id="line"></div>
 <article id="article" class="main">
     <div>
-        <h2>Category Name (13 items)</h2>
+
+        <h2>{{category.title}} - ({{itemsCount}} items) </h2>
         <ul>
+            {% for i in items %}
             <li>
-                <a href="#" class="list">Futebol
-                    <span>(Categoria)</a>
+                <a href="{{url_for('showItem', catalogItemId = i.category.id, itemId = i.id)}}" class="list">{{i.title}}
             </li>
-            <li>
-                <a href="#" class="list">Futebol
-                    <span>(Categoria)</a>
-            </li>
-            <li>
-                <a href="#" class="list">Futebol
-                    <span>(Categoria)</a>
-            </li>
-            <li>
-                <a href="#" class="list">Futebol
-                    <span>(Categoria)</a>
-            </li>
+            {% endfor %}
         </ul>
     </div>
-    <a href="" class="btn btn-primary">Add New Item</a>
+    <div id="buttons">
+        <a href="{{url_for('newItem')}}" class="btn btn-primary">Add New Item</a>
+        <a href="{{url_for('deleteCategory', categoryId = category.id)}}" id="delete-category">Delete Category</a>
+    </div>
 </article>
 
 {% endblock %}
