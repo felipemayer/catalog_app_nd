@@ -1,9 +1,10 @@
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, jsonify
+from json import dump
 app = Flask(__name__)
 
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
-from models import Base, Category, Item
+from models import Base, Category, Item, User
 engine = create_engine('sqlite:///catalogapp.db',
                        connect_args={'check_same_thread': False})
 Base.metadata.bind = engine
@@ -35,7 +36,7 @@ def newItem():
         category = session.query(Category).filter_by(
             title=request.form['category']).one()
         item = Item(
-            title=request.form['title'], description=request.form['description'], category=category)
+            title=request.form['title'], description=request.form['description'], category=category, user=getUser())
         session.add(item)
         session.commit()
         return redirect(url_for('showHome'))
@@ -114,9 +115,27 @@ def deleteCategory(categoryId):
         return render_template('delete_category.html', category=category)
 
 
-@app.route("/catalog/api")
-def catalogJson():
-    return "Json Catalog"
+@app.route("/api/catalog")
+def getCatalog():
+    categories = session.query(Category).all()
+    return jsonify(Category=[c.serialize for c in categories])
+
+
+@app.route("/api/items")
+def getItems():
+    items = session.query(Item).all()
+    return jsonify(Items=[i.serialize for i in items])
+
+
+@app.route("/api/items/<int:categoryId>")
+def getItemsByCategory(categoryId):
+    items = session.query(Item).filter_by(categoryId=categoryId).all()
+    return jsonify(Items=[i.serialize for i in items])
+
+
+# temporary
+def getUser():
+    return session.query(User).filter_by(id=1).one()
 
 
 if __name__ == '__main__':

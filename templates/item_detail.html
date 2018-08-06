@@ -2,13 +2,17 @@
 super() }}{%endblock%}{% block content %}
 <div id="item-detail" class="main">
     <div>
-        <h2>{{item.title}}</h2>
+        <div id="top-article">
+            <h2>{{item.title}}</h2>
+            <a href="{{url_for('editItem', itemId = item.id)}}" class="icon">
+                <img src="{{url_for('static', filename='edit.png')}}" alt="">
+            </a>
+            <a href="{{url_for('deleteItem', itemId = item.id)}}" class="icon">
+                <img src="{{url_for('static', filename='delete.png')}}" alt="">
+            </a>
+        </div>
         <p>{{item.description}} </p>
     </div>
-    <div id="buttons">
-        <a href="{{url_for('editItem', itemId = item.id)}}" class="btn btn-confirm">Edit</a>
-        <a href="{{url_for('deleteItem', itemId = item.id)}}" class="btn btn-danger" id="delete-item">Delete</a>
-        <a href="{{url_for('showHome')}}">Cancel</a>
-    </div>
+    <a href="{{url_for('showHome')}}">Back</a>
 </div>
 {% endblock %}
