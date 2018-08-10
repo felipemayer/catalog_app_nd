@@ -18,12 +18,14 @@ super() }}{%endblock%}{% block content %}
     <div>
         <div id="top-article">
             <h2>{{category.title}} - ({{itemsCount}} items) </h2>
+            {% if category.user_id == g.userId %}
             <a href="{{url_for('editCategory', categoryId = category.id)}}" class="icon">
                 <img src="{{url_for('static', filename='edit.png')}}" alt="">
             </a>
             <a href="{{url_for('deleteCategory', categoryId = category.id)}}" class="icon">
                 <img src="{{url_for('static', filename='delete.png')}}" alt="">
             </a>
+            {% endif %}
         </div>
         <ul>
             {% for i in items %}

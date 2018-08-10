@@ -1,8 +1,9 @@
 {% extends "layout.html" %} {% block title %}Index{% endblock %} {% block head %} {{ super() }} {% endblock %}{%block navbar%}{{
-super() }}{%endblock%}{% block content %}
+super() }}{%endblock%}{% block content %} {% with messages = get_flashed_messages() %} {% if messages %} {% endif %} {% endwith
+%}
 <aside id="side">
     <div>
-        <h3>Categories</h3>
+        <h3>Categories </h3>
         <ul>
             {% for c in categories %}
             <li>

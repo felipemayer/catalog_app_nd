@@ -3,6 +3,13 @@
 
 <head>
     {% block head %}
+    <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js">
+    </script>
+
+    <script src="//apis.google.com/js/platform.js?onload=start"> </script>
+
+    <!-- END PRE-REQUISITES FOR GOOGLE SIGN IN -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
     <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
     <title>{% block title %}{% endblock %} - My Webpage</title>
@@ -14,7 +21,14 @@
         <a href="{{url_for('showHome')}}">
             <h1>Catalog App</h1>
         </a>
-        <a href="" class="btn btn-primary">Login</a>
+        <div>
+            {% if g.user != None %}
+            <span>{{g.userName}} | </span>
+            <a href="{{url_for('gdisconnect')}}" class="">Logout</a>
+            {% else %}
+            <a href="{{url_for('showLogin')}}" class="btn btn-primary">Login</a>
+            {%endif%}
+        </div>
         {%endblock%}
     </nav>
     <div id="container">{% block content %}{% endblock %}</div>

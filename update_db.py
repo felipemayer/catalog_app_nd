@@ -11,10 +11,10 @@ cats = session.query(Category).delete()
 items = session.query(Item).delete()
 user = session.query(User).delete()
 
-user1 = User(name="Felipe", email="fe@mayer.com")
+user1 = User(name="Felipe", email="fesssss@mayaaer.com")
 session.add(user1)
 
-user2 = User(name="Paula", email="paula@bergamaschi.com")
+user2 = User(name="Paula", email="paula@bergaaamaschi.aaaacom")
 session.add(user2)
 
 cat1 = Category(title="Categoria 1", user=user1)

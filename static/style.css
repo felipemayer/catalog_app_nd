@@ -71,6 +71,7 @@ textarea {
   display: flex;
   height: 60px;
   align-items: center;
+  color: #ffffff;
   justify-content: space-between;
 }
 

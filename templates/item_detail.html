@@ -4,12 +4,14 @@ super() }}{%endblock%}{% block content %}
     <div>
         <div id="top-article">
             <h2>{{item.title}}</h2>
+            {% if item.user_id == g.userId %}
             <a href="{{url_for('editItem', itemId = item.id)}}" class="icon">
                 <img src="{{url_for('static', filename='edit.png')}}" alt="">
             </a>
             <a href="{{url_for('deleteItem', itemId = item.id)}}" class="icon">
                 <img src="{{url_for('static', filename='delete.png')}}" alt="">
             </a>
+            {% endif %}
         </div>
         <p>{{item.description}} </p>
     </div>

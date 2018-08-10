@@ -15,7 +15,7 @@ class User(Base):
 
     id = Column(Integer, primary_key=True)
     name = Column(String(50), nullable=False)
-    email = Column(String(50), nullable=False)
+    email = Column(String(100), nullable=False, unique=True)
     picture = Column(String(250))
     created_at = Column(TIMESTAMP, default=datetime.utcnow, nullable=False)
     updated_at = Column(TIMESTAMP, default=datetime.utcnow,
