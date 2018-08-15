@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, g
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, g  # noqa
 from flask import session as login_session
 import random
 import string
@@ -35,19 +35,25 @@ def showLogin():
     return render_template('login.html', STATE=state)
 
 
+@app.route('/logout')
+def logout():
+    return render_template('logout.html')
+
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
     # Validate state token
     if request.args.get('state') != login_session['state']:
-        response = make_response(json.dumps('Invalid state parameter.'), 401)
+        response = make_response(json.dumps(
+            'Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
-    # Obtain authorization code
     code = request.data
 
     try:
         # Upgrade the authorization code into a credentials object
-        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow = flow_from_clientsecrets(
+            'client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
         credentials = oauth_flow.step2_exchange(code)
     except FlowExchangeError:
@@ -87,7 +93,7 @@ def gconnect():
     stored_access_token = login_session.get('access_token')
     stored_gplus_id = login_session.get('gplus_id')
     if stored_access_token is not None and gplus_id == stored_gplus_id:
-        response = make_response(json.dumps('Current user is already connected.'),
+        response = make_response(json.dumps('Current user is already connected.'),  # noqa
                                  200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -109,7 +115,7 @@ def gconnect():
 
     user = session.query(User).filter_by(
         email=login_session['email']).one_or_none()
-    if user == None:
+    if user is None:
         createUser()
 
     output = ''
@@ -132,34 +138,41 @@ def gdisconnect():
         response = make_response(json.dumps(
             'Current user not connected.'), 401)
         response.headers['Content-Type'] = 'application/json'
-        return response
-    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']
+        return redirect(url_for('showHome'))
+    url = 'https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token']  # noqa
     h = httplib2.Http()
     result = h.request(url, 'GET')[0]
     print('result is ')
     print(result)
+    #  success on logout
     if result['status'] == '200':
         del login_session['access_token']
         del login_session['gplus_id']
         del login_session['username']
         del login_session['email']
         del login_session['picture']
-        response = make_response(json.dumps('Successfully disconnected.'), 200)
+        response = make_response(json.dumps(
+            'Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        return redirect(url_for('showHome'))
+    #  fail on logout
     else:
         response = make_response(json.dumps(
             'Failed to revoke token for given user.'), 400)
         response.headers['Content-Type'] = 'application/json'
-        return response
+        return redirect(url_for('showHome'))
+
+#  Create new user on DB
 
 
 def createUser():
     current_user = User(
-        name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
+        name=login_session['username'], email=login_session['email'], picture=login_session['picture'])  # noqa
     session.add(current_user)
     session.commit()
     print(current_user.name + " " + str(current_user.id))
+
+#  before request check if user is logged
 
 
 @app.before_request
@@ -167,7 +180,8 @@ def getCurrentUser():
     if 'email' in login_session:
         user = session.query(User).filter_by(
             email=login_session['email']).one_or_none()
-        if user != None:
+        #  if user is logged update global data g
+        if user is not None:
             g.user = user
             g.userId = user.id
             g.userName = user.name
@@ -176,16 +190,14 @@ def getCurrentUser():
     else:
         g.user = None
 
+#  routes from ui
+
 
 @app.route("/")
 def showHome():
-    users = session.query(User).all()
-    for u in users:
-        print(str(u.id) + " " + u.name + " " + u.email)
-    if 'username' in login_session:
-        print(login_session['username'])
     categories = session.query(Category).all()
-    items = session.query(Item).order_by(desc(Item.updated_at)).limit(10).all()
+    items = session.query(Item).order_by(
+        desc(Item.updated_at)).limit(10).all()
     return render_template('home.html', categories=categories, items=items)
 
 
@@ -195,8 +207,9 @@ def showCatalogItems(categoryTitle, categoryId):
     items = session.query(Item).order_by(
         Item.created_at).filter_by(categoryId=categoryId).all()
     category = session.query(Category).filter_by(id=categoryId).one()
-    itemsCount = session.query(Item).filter_by(categoryId=categoryId).count()
-    return render_template('items.html', categories=categories, items=items, itemsCount=itemsCount, category=category)
+    itemsCount = session.query(Item).filter_by(
+        categoryId=categoryId).count()
+    return render_template('items.html', categories=categories, items=items, itemsCount=itemsCount, category=category)  # noqa
 
 
 @app.route("/catalog/item/new", methods=['GET', 'POST'])
@@ -208,7 +221,7 @@ def newItem():
         category = session.query(Category).filter_by(
             title=request.form['category']).one()
         item = Item(
-            title=request.form['title'], description=request.form['description'], category=category, user_id=g.userId)
+            title=request.form['title'], description=request.form['description'], category=category, user_id=g.userId)  # noqa
         session.add(item)
         session.commit()
         return redirect(url_for('showHome'))
@@ -232,7 +245,7 @@ def editItem(itemId):
         session.commit()
         return redirect(url_for('showHome'))
     else:
-        return render_template('edit_item.html', item=item, categories=categories)
+        return render_template('edit_item.html', item=item, categories=categories)  # noqa
 
 
 @app.route("/catalog/<int:catalogItemId>/<int:itemId>")
@@ -281,7 +294,7 @@ def deleteItem(itemId):
         return render_template('delete_item.html', item=item)
 
 
-@app.route("/catalog/category/<int:categoryId>/delete", methods=['GET', 'POST'])
+@app.route("/catalog/category/<int:categoryId>/delete", methods=['GET', 'POST'])  # noqa
 def deleteCategory(categoryId):
     if 'username' not in login_session:
         return redirect('/login')
@@ -296,11 +309,17 @@ def deleteCategory(categoryId):
     else:
         return render_template('delete_category.html', category=category)
 
+#  /api/ responses
+
+#  get all categories
+
 
 @app.route("/api/v1/catalog")
-def getCatalog():
+def getCategories():
     categories = session.query(Category).all()
     return jsonify(Category=[c.serialize for c in categories])
+
+#  get all items
 
 
 @app.route("/api/v1/items")
@@ -308,6 +327,8 @@ def getItems():
     items = session.query(Item).all()
     return jsonify(Items=[i.serialize for i in items])
 
+
+#  get all itens from category
 
 @app.route("/api/v1/items/<int:categoryId>")
 def getItemsByCategory(categoryId):

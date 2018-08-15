@@ -37,7 +37,9 @@ super() }}{%endblock%}{% block content %}
     </div>
     <div id="buttons">
         <a href="{{url_for('newItem')}}" class="btn btn-primary">Add New Item</a>
+        {% if category.user_id == g.userId %}
         <a href="{{url_for('deleteCategory', categoryId = category.id)}}" id="delete-category">Delete Category</a>
+        {% endif %}
     </div>
 </article>
 

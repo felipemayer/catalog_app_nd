@@ -24,7 +24,7 @@
         <div>
             {% if g.user != None %}
             <span>{{g.userName}} | </span>
-            <a href="{{url_for('gdisconnect')}}" class="">Logout</a>
+            <a href="{{url_for('logout')}}" class="">Logout</a>
             {% else %}
             <a href="{{url_for('showLogin')}}" class="btn btn-primary">Login</a>
             {%endif%}

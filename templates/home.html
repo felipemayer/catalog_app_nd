@@ -27,9 +27,7 @@ super() }}{%endblock%}{% block content %} {% with messages = get_flashed_message
             {% endfor %}
         </ul>
     </div>
-    <div id="buttons">
-        <a href="{{url_for('newItem')}}" class="btn btn-primary">Add New Item</a>
-    </div>
+
 </article>
 
 {% endblock %}
