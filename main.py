@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, g  # noqa
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, g, abort  # noqa
 from flask import session as login_session
 import random
 import string
@@ -334,6 +334,16 @@ def getItems():
 def getItemsByCategory(categoryId):
     items = session.query(Item).filter_by(categoryId=categoryId).all()
     return jsonify(Items=[i.serialize for i in items])
+
+
+#  get especific item
+
+@app.route("/api/v1/<int:categoryId>/<int:itemId>")
+def getItem(categoryId, itemId):
+    item = session.query(Item).filter_by(
+        categoryId=categoryId, id=itemId).one_or_none()
+
+    return jsonify(item.serialize) if item is not None else abort(404)
 
 
 if __name__ == 'main':
