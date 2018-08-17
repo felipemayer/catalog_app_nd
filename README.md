@@ -28,48 +28,14 @@ source venv/Scripts/activate
 
 6. Instal dependencies
 
-Flask
-
 ```
-pip install flask
-```
-
-sqlalchemy
-
-```
-pip install sqlalchemy
-```
-
-oauth2client
-
-```
-pip install oauth2client
-```
-
-httplib2
-
-```
-pip install httplib2
-```
-
-requests
-
-```
-pip install requests
-```
-
-7. Get some Data (optional)
-
-If you want some data to start run:
-
-```
-python get_data.py
+pip install -r requirements.txt
 ```
 
 8. Run Flask
 
 ```
-export FLASK_APP=my_application
+export FLASK_APP=main.py
 ```
 
 ```
@@ -90,7 +56,7 @@ http://pep8online.com/
 
 ## Developed With
 
-- Python
+- Python 3.6.5
 
 ## Versioning
 
