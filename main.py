@@ -1,27 +1,19 @@
-from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, g, abort  # noqa
+from flask import Flask, render_template, request, redirect, url_for, jsonify, flash, g, abort, make_response  # noqa
 from flask import session as login_session
 import random
 import string
 from sqlalchemy import create_engine, desc
 from sqlalchemy.orm import sessionmaker
-from models import Base, Category, Item, User
-from oauth2client.client import flow_from_clientsecrets
-from oauth2client.client import FlowExchangeError
+import crud
+from oauth2client.client import flow_from_clientsecrets, FlowExchangeError
 import httplib2
 import json
-from flask import make_response
 import requests
 
 app = Flask(__name__)
 
 CLIENT_ID = json.loads(
     open('client_secrets.json', 'r').read())['web']['client_id']
-
-engine = create_engine('sqlite:///catalogapp.db',
-                       connect_args={'check_same_thread': False})
-Base.metadata.bind = engine
-DBSession = sessionmaker(bind=engine)
-session = DBSession()
 
 # Create anti-forgery state token
 
@@ -113,10 +105,10 @@ def gconnect():
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
-    user = session.query(User).filter_by(
-        email=login_session['email']).one_or_none()
+    user = crud.getUserByEmail(login_session['email'])
     if user is None:
-        createUser()
+        crud.createUser(
+            login_session['username'], login_session['email'], login_session['picture'])
 
     output = ''
     output += '<h1>Welcome, '
@@ -162,15 +154,6 @@ def gdisconnect():
         response.headers['Content-Type'] = 'application/json'
         return redirect(url_for('showHome'))
 
-#  Create new user on DB
-
-
-def createUser():
-    current_user = User(
-        name=login_session['username'], email=login_session['email'], picture=login_session['picture'])  # noqa
-    session.add(current_user)
-    session.commit()
-    print(current_user.name + " " + str(current_user.id))
 
 #  before request check if user is logged
 
@@ -178,8 +161,7 @@ def createUser():
 @app.before_request
 def getCurrentUser():
     if 'email' in login_session:
-        user = session.query(User).filter_by(
-            email=login_session['email']).one_or_none()
+        user = crud.getUserByEmail(login_session['email'])
         #  if user is logged update global data g
         if user is not None:
             g.user = user
@@ -195,35 +177,28 @@ def getCurrentUser():
 
 @app.route("/")
 def showHome():
-    categories = session.query(Category).all()
-    items = session.query(Item).order_by(
-        desc(Item.updated_at)).limit(10).all()
+    categories = crud.getAllCategories()
+    items = crud.getItemsbyQty(10)
     return render_template('home.html', categories=categories, items=items)
 
 
-@app.route("/catalog/<string:categoryTitle>/<int:categoryId>/items")
-def showCatalogItems(categoryTitle, categoryId):
-    categories = session.query(Category).all()
-    items = session.query(Item).order_by(
-        Item.created_at).filter_by(categoryId=categoryId).all()
-    category = session.query(Category).filter_by(id=categoryId).one()
-    itemsCount = session.query(Item).filter_by(
-        categoryId=categoryId).count()
-    return render_template('items.html', categories=categories, items=items, itemsCount=itemsCount, category=category)  # noqa
+@app.route("/catalog/<int:categoryId>/items")
+def showCatalogItems(categoryId):
+    categories = crud.getAllCategories()
+    items = crud.getItemsByCategory(categoryId)
+    category = crud.getCategoryById(categoryId)
+    return render_template('items.html', categories=categories, items=items, itemsCount=len(items), category=category)  # noqa
 
 
 @app.route("/catalog/item/new", methods=['GET', 'POST'])
 def newItem():
     if 'username' not in login_session:
         return redirect('/login')
-    categories = session.query(Category).all()
+    categories = crud.getAllCategories()
     if request.method == 'POST':
-        category = session.query(Category).filter_by(
-            title=request.form['category']).one()
-        item = Item(
-            title=request.form['title'], description=request.form['description'], category=category, user_id=g.userId)  # noqa
-        session.add(item)
-        session.commit()
+        category = crud.getCategoryByTitle(request.form['category'])
+        crud.createItem(
+            category, request.form['title'], request.form['description'], g.userId)
         return redirect(url_for('showHome'))
     else:
         return render_template('new_item.html', categories=categories)
@@ -233,16 +208,12 @@ def newItem():
 def editItem(itemId):
     if 'username' not in login_session:
         return redirect('/login')
-    item = session.query(Item).filter_by(id=itemId).one()
-    categories = session.query(Category).all()
+    item = crud.getItem(itemId)
+    categories = crud.getAllCategories()
     if request.method == 'POST':
-        item.title = request.form['title']
-        item.description = request.form['description']
-        category = session.query(Category).filter_by(
-            title=request.form['category']).one()
-        item.category = category
-        session.add(item)
-        session.commit()
+        category = crud.getCategoryByTitle(request.form['category'])
+        crud.editItem(item, category,
+                      request.form['title'], request.form['description'])
         return redirect(url_for('showHome'))
     else:
         return render_template('edit_item.html', item=item, categories=categories)  # noqa
@@ -250,7 +221,7 @@ def editItem(itemId):
 
 @app.route("/catalog/<int:catalogItemId>/<int:itemId>")
 def showItem(catalogItemId, itemId):
-    item = session.query(Item).filter_by(id=itemId).one()
+    item = crud.getItem(itemId)
     return render_template('item_detail.html', item=item)
 
 
@@ -259,9 +230,7 @@ def newCategory():
     if 'username' not in login_session:
         return redirect('/login')
     if request.method == 'POST':
-        category = Category(title=request.form['title'], user_id=g.userId)
-        session.add(category)
-        session.commit()
+        crud.createCategory(request.form['title'], g.userId)
         return redirect(url_for('showHome'))
     else:
         return render_template('new_category.html')
@@ -271,11 +240,9 @@ def newCategory():
 def editCategory(categoryId):
     if 'username' not in login_session:
         return redirect('/login')
-    category = session.query(Category).filter_by(id=categoryId).one()
+    category = crud.getCategoryById(categoryId)
     if request.method == 'POST':
-        category.title = request.form['title']
-        session.add(category)
-        session.commit()
+        crud.editCategory(category, request.form['title'])
         return redirect(url_for('showHome'))
     else:
         return render_template('edit_category.html', category=category)
@@ -285,10 +252,9 @@ def editCategory(categoryId):
 def deleteItem(itemId):
     if 'username' not in login_session:
         return redirect('/login')
-    item = session.query(Item).filter_by(id=itemId).one()
+    item = crud.getItem(itemId)
     if request.method == 'POST':
-        session.delete(item)
-        session.commit()
+        crud.deleteItem(item)
         return redirect(url_for('showHome'))
     else:
         return render_template('delete_item.html', item=item)
@@ -298,13 +264,9 @@ def deleteItem(itemId):
 def deleteCategory(categoryId):
     if 'username' not in login_session:
         return redirect('/login')
-    category = session.query(Category).filter_by(id=categoryId).one()
+    category = crud.getCategoryById(categoryId)
     if request.method == 'POST':
-        items = session.query(Item).filter_by(categoryId=categoryId).all()
-        for i in items:
-            session.delete(i)
-        session.delete(category)
-        session.commit()
+        crud.deleteCategory(category)
         return redirect(url_for('showHome'))
     else:
         return render_template('delete_category.html', category=category)
@@ -316,7 +278,7 @@ def deleteCategory(categoryId):
 
 @app.route("/api/v1/catalog")
 def getCategories():
-    categories = session.query(Category).all()
+    categories = crud.getAllCategories()
     return jsonify(Category=[c.serialize for c in categories])
 
 #  get all items
@@ -324,7 +286,7 @@ def getCategories():
 
 @app.route("/api/v1/items")
 def getItems():
-    items = session.query(Item).all()
+    items = crud.getItems()
     return jsonify(Items=[i.serialize for i in items])
 
 
@@ -332,7 +294,7 @@ def getItems():
 
 @app.route("/api/v1/items/<int:categoryId>")
 def getItemsByCategory(categoryId):
-    items = session.query(Item).filter_by(categoryId=categoryId).all()
+    items = crud.getItemsByCategory(categoryId)
     return jsonify(Items=[i.serialize for i in items])
 
 
@@ -340,9 +302,7 @@ def getItemsByCategory(categoryId):
 
 @app.route("/api/v1/<int:categoryId>/<int:itemId>")
 def getItem(categoryId, itemId):
-    item = session.query(Item).filter_by(
-        categoryId=categoryId, id=itemId).one_or_none()
-
+    item = crud.getItemByCategory(itemId, categoryId)
     return jsonify(item.serialize) if item is not None else abort(404)
 
 

@@ -7,7 +7,7 @@ super() }}{%endblock%}{% block content %} {% with messages = get_flashed_message
         <ul>
             {% for c in categories %}
             <li>
-                <a href="{{url_for('showCatalogItems', categoryTitle = c.title, categoryId = c.id)}}" class="list-item">{{c.title}}</a>
+                <a href="{{url_for('showCatalogItems', categoryId = c.id)}}" class="list-item">{{c.title}}</a>
             </li>
             {% endfor %}
         </ul>
