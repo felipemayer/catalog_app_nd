@@ -4,7 +4,7 @@ super() }}{%endblock%}{% block content %}
     <div>
         <div id="top-article">
             <h2>{{item.title}}</h2>
-            {% if item.user_id == g.userId %}
+            {% if logged and owner %}
             <a href="{{url_for('editItem', itemId = item.id)}}" class="icon">
                 <img src="{{url_for('static', filename='edit.png')}}" alt="">
             </a>

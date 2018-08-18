@@ -172,6 +172,14 @@ def getCurrentUser():
     else:
         g.user = None
 
+
+def userIsLogged():
+    return False if 'username' not in login_session else True
+
+
+def userIsOwner(item_or_category):
+    return True if item_or_category.user_id == g.userId else False
+
 #  routes from ui
 
 
@@ -187,7 +195,9 @@ def showCatalogItems(categoryId):
     categories = crud.getAllCategories()
     items = crud.getItemsByCategory(categoryId)
     category = crud.getCategoryById(categoryId)
-    return render_template('items.html', categories=categories, items=items, itemsCount=len(items), category=category)  # noqa
+    logged = userIsLogged()
+    owner = userIsOwner(category) if logged else False
+    return render_template('items.html', categories=categories, items=items, itemsCount=len(items), category=category, logged=logged, owner=owner)  # noqa
 
 
 @app.route("/catalog/item/new", methods=['GET', 'POST'])
@@ -222,7 +232,9 @@ def editItem(itemId):
 @app.route("/catalog/<int:catalogItemId>/<int:itemId>")
 def showItem(catalogItemId, itemId):
     item = crud.getItem(itemId)
-    return render_template('item_detail.html', item=item)
+    logged = userIsLogged()
+    owner = userIsOwner(item) if logged else False
+    return render_template('item_detail.html', item=item, logged=logged, owner=owner)
 
 
 @app.route("/catalog/category/new", methods=['GET', 'POST'])
