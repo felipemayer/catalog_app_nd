@@ -216,9 +216,13 @@ def newItem():
 
 @app.route("/catalog/item/<int:itemId>/edit", methods=['GET', 'POST'])
 def editItem(itemId):
+    item = crud.getItem(itemId)
     if 'username' not in login_session:
         return redirect('/login')
-    item = crud.getItem(itemId)
+    else:
+        if item.user_id is not g.userId:
+            return redirect(url_for('showHome'))    
+    
     categories = crud.getAllCategories()
     if request.method == 'POST':
         category = crud.getCategoryByTitle(request.form['category'])
@@ -250,9 +254,14 @@ def newCategory():
 
 @app.route("/catalog/category/<int:categoryId>/edit", methods=['GET', 'POST'])
 def editCategory(categoryId):
+    category = crud.getCategoryById(categoryId)
+
     if 'username' not in login_session:
         return redirect('/login')
-    category = crud.getCategoryById(categoryId)
+    else:
+        if category.user_id is not g.userId:
+            return redirect(url_for('showHome'))
+    
     if request.method == 'POST':
         crud.editCategory(category, request.form['title'])
         return redirect(url_for('showHome'))
@@ -262,9 +271,15 @@ def editCategory(categoryId):
 
 @app.route("/catalog/item/<int:itemId>/delete", methods=['GET', 'POST'])
 def deleteItem(itemId):
+    item = crud.getItem(itemId)
+
     if 'username' not in login_session:
         return redirect('/login')
-    item = crud.getItem(itemId)
+    else:
+        if item.user_id is not g.userId:
+            return redirect(url_for('showHome'))
+
+    
     if request.method == 'POST':
         crud.deleteItem(item)
         return redirect(url_for('showHome'))
@@ -274,9 +289,14 @@ def deleteItem(itemId):
 
 @app.route("/catalog/category/<int:categoryId>/delete", methods=['GET', 'POST'])  # noqa
 def deleteCategory(categoryId):
+    category = crud.getCategoryById(categoryId)
+
     if 'username' not in login_session:
         return redirect('/login')
-    category = crud.getCategoryById(categoryId)
+    else:
+        if category.user_id is not g.userId:
+            return redirect(url_for('showHome'))
+    
     if request.method == 'POST':
         crud.deleteCategory(category)
         return redirect(url_for('showHome'))
